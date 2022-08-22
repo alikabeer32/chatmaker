@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="quill-emoji.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<style>
+body{
+  background-color: #2e2e2e;
+  font-family: roboto;
+  margin: 0;
+}
+
+p{
+  margin:0;
+}
+
+
+.nodeHeader{
+  content:attr(title) " ";
+  display: block;
+  border-top-left-radius:.75em;
+  border-top-right-radius:.75em;
+  background-color:#6e6e6e;
+  padding:0.1em .3em 0em;
+  margin:-.1em -.3em 0.2em;
+}
+.node{
+  background-color: #4e4e4e;
+  border-radius: .75em;
+  color:#e4e4e4;
+  display: inline-block;
+  padding:0.1em .3em .25em;
+  position:absolute;
+  white-space: nowrap;
+}
+
+.connection{
+  color:rgb(204, 204, 204);
+}
+
+.output,
+.connection:after{
+  position:absolute;
+  border:solid 1px #dedede;
+  background-color:#2e2e2e;
+  width:0.5em;
+  height:0.5em;
+  border-radius:0.5em;  
+}
+.node.connected > .output,
+.connection.filled:after{
+  border:solid 1px transparent;
+  background-color:#aeaeae;
+}
+.node > .output:hover,
+.connection:hover:after{
+  border-color:red;
+}
+.output{
+  left: -.5em;
+  top:1em;
+  cursor: pointer;
+}
+.connection{
+  width:100%;
+  position:relative;
+  padding-right:0.5em;
+  cursor:pointer;
+}
+.connection:after{
+  content:"";
+  right:0em;
+  top:0.25em;
+}
+.svg{
+  position:absolute;
+  top:0px;
+  left:0px;
+  z-index:-100;
+  width:100%;
+  height:100%;
+}
+
+.dial{
+  display:none;
+  background: #fff;
+  padding: 50px;
+  position: fixed;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#menu{
+  display: block;
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 5px;
+  z-index: 1;
+}
+
+.message {
+  background: white;
+  color: black;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+  max-width: 160px;
+  font-size: 14px;
+  white-space:normal;
+}
+
+.firstNode{
+	border: 5px solid deepskyblue;
+    box-shadow: 0px 0px 10px 0px deepskyblue;
+    border-radius: 18px;
+}
+
+#area{
+  transform-origin: 0% 0% 0px;
+}
+
+.buttons{
+  position: absolute;
+  z-index: 2;
+}
+
+.inputBox{
+  display: block;
+  min-width: 182px;
+}
+
+.inputVar{
+  width: 140px;
+  border-radius: 8px;
+  border: none;
+  padding: 5px;
+  margin: 5px 0 13px 0;
+}
+
+.done{
+  width: 14%;
+  float: right;
+  margin: 8px 0 13px 0;
+}
+
+.varText{
+  font-size: 12px;
+  font-weight: 100;
+  margin: 5px;
+  color: #4ff763;    
+  overflow: hidden;
+}
+
+.varName{
+  width: 140px;
+  position: relative;
+  float: left;
+}
+
+#close{
+  position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+
+</style>
+<body>
+
+
+  
+      <div class="phone">
+        <div class="phone-header">
+          <div class="phone-header-back">
+            <div class="phone-header-back__icon"></div>
+          </div>
+          <div class="phone-header-contact">
+            <div class="phone-header-contact__avatar">
+              <img src="https://github.com/Timothy1982/chat-app-css-illustration/raw/master/images/avatar.jpg" alt="Samuel Green's Avatar" />
+            </div>
+            <div class="phone-header-contact__name">
+              <strong>Samuel Green</strong><br />
+              Available to Walk
+            </div>
+          </div>
+          <div class="phone-header-options">
+            <div class="phone-header-options__icon"></div>
+          </div>
+        </div>
+
+        <div id="chatscroll">            
+          <div id="phone-chat" class="phone-chat">
+          </div>
+        </div>
+
+        <div class="phone-input">
+          <input id="textInp" placeholder="Type a message…" type="text">
+          <input id="textSubmit" placeholder="Type a message…" type="submit">
+          
+          <div class="phone-input__btn"></div>
+        </div>
+      </div>
+
+
+  <div id="dial" class="dial">
+  <div id="editor" style="max-height: 300px;"></div>
+    <button id="submit">Sub</button>
+    <div id="close">X</div>
+  </div>
+<div class="buttons">
+
+  <div id="save">
+    save
+  </div>
+
+  <div id="zoom-in">
+    zoom in
+  </div>
+  
+  <div id="zoom-out">
+    zoom out
+  </div>
+
+  <div id="preview">
+    preview
+  </div>
+
+  <div id="reset">
+    reset
+  </div>
+
+</div>
+  <div id="area" class=".body">
+    <div id="menu">
+    </div>
+      <svg class="svg"id="svg"></svg>
+  </div>
+
+</body>
+<script src="preview.bundled.js"></script>
+<!-- 
+<script>
+
+var toolbarOptions = {
+        container: [
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'script': 'sub' }, { 'script': 'super' }],
+          [{ 'color': [] }, { 'background': [] }],
+          ['clean'],
+          ['emoji'],
+          ['link', 'image']
+        ],
+        handlers: {
+          'emoji': function () {},
+          'image': function () {},
+        }
+      };
+
+      var quill = new Quill('#editor', {
+        modules: {
+          "toolbar": toolbarOptions,
+          "emoji-toolbar": true,
+          "emoji-shortname": true,
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow',
+      });
+
+var curYPos = 0;
+var curXPos = 0;
+var curDown = false;
+
+var area = document.getElementById("area");
+var svgEl = document.getElementById("svg");
+var zoomIn = document.getElementById("zoom-in");
+var zoomOut = document.getElementById("zoom-out");
+var zoom=1;
+
+$(document).on("mousemove", function (event) {
+  //$(document).width();
+  //e.stopImmediatePropagation();
+  if (curDown === true) {
+    $(document).scrollTop(parseInt($(document).scrollTop() + (curYPos - event.pageY)));
+    $(document).scrollLeft(parseInt($(document).scrollLeft() + (curXPos - event.pageX)));
+  }
+});
+
+$(area).on("mousedown", function (e) {  curDown = true; curYPos = e.pageY; curXPos = e.pageX; e.preventDefault(); });
+$(window).on("mouseup", function (e) { curDown = false; });
+
+//initUIAll
+
+function initUIAll(){
+  for(var i=0; i<collection.length; i++){
+    collection[i].initUI();
+  }
+}
+
+
+function setDimentions(){
+  curDown = false; 
+  //if(zoom == 1){
+    sL = $(document).scrollLeft();
+    sT = $(document).scrollTop();
+    $(area).removeAttr('style');
+    $(svg).removeAttr('style');
+
+    $(area).css("height", $(document).height()+"px");
+    $(area).css("width", $(document).width()+"px");
+    
+    $(svg).css("height", $(document).height()+"px");
+    $(svg).css("width", $(document).width()+"px");
+
+    // $('body').css("height", $(document).height()+"px");
+    // $('body').css("width", $(document).width()+"px");
+
+
+    $(document).scrollLeft(sL);
+    $(document).scrollTop(sT);
+
+    //area.style.zoom = zoom;
+    area.style.transform = "scale("+zoom+")";
+    initUIAll();
+  //}
+
+}
+
+$(window).on("load", function () {
+  setDimentions();
+
+});
+
+$(window).on("mouseout", function (e) { 
+  
+    setDimentions();
+  
+});
+
+$('.node').mousedown(function(){
+   //what can I write here to prevent parent's click event from fireing?
+   //e.stopPropagation();
+   alert("asd");
+   //event.stopImmediatePropagation() already 
+   });
+
+document.body.onclick = function(){
+  menu.style.display = "none";
+}
+
+
+
+zoomIn.onclick= function(){
+   area.style.transform = "scale(1)";
+   zoom = 1;
+   setDimentions();
+}
+
+zoomOut.onclick= function(){
+   area.style.transform = "scale(0.7)";
+   zoom = 0.7;
+   setDimentions();
+}
+
+
+document.addEventListener("DOMContentLoaded", function(){
+  /*
+  for(var i=0;i<collection.lenth; i++){
+    collection[i].configure();
+  }
+*/
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        //console.log(this.responseText);
+        var chatdat = JSON.parse(this.responseText);
+        //console.log(chatdat);
+        chatText = chatdat[0].chatdat.json;
+        //console.log(chatText);
+        chatJson = JSON.parse(chatText);
+        //console.log(chatJson);
+        initialize(chatJson);
+      }
+    };
+
+  //console.log(dialogue);
+  var dat = JSON.stringify(dialogue);
+  //console.log(dat);
+
+  xhttp.open("POST", "/fetch", true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send();
+})
+
+// SVG SETUP
+  // ===========
+  var svg = document.getElementById('svg');
+  svg.ns = svg.namespaceURI;
+  
+  //Dial setup
+  var dial = document.getElementById('dial');
+  var menu = document.getElementById('menu');
+  var inp = document.getElementById('inp');
+  var submit = document.getElementById('submit');
+  var close = document.getElementById('close');
+  var save = document.getElementById('save');
+  var inputting = {};
+  var dialogue = [];
+
+  close.onclick = function(){
+    dial.style.display = "none";
+  }
+
+  area.oncontextmenu = function(e){
+    //var evt = new Object({keyCode:93});
+    ///stopEvent(e); 
+    var newNode = document.createElement('div');
+    newNode.innerHTML = "Add new Dialogue";
+
+    var newInput = document.createElement('div');
+    newInput.innerHTML = "Add new User Input";    
+
+    var newSubmit = document.createElement('div');
+    newSubmit.innerHTML = "Add Submit Data Node";
+
+    menu.innerHTML = "";
+    e.stopPropagation();
+    var x = e.clientX /zoom + $(document).scrollLeft();     // Get the horizontal coordinate
+    var y = e.clientY /zoom + $(document).scrollTop();     // Get the vertical coordinate
+    event.preventDefault();
+    newNode.onclick = function(){
+        createNode(x,y,"node");
+    }    
+    newInput.onclick = function(){
+        createNode(x,y,"input");
+    }    
+    newSubmit.onclick = function(){
+        createNode(x,y,"submit");
+    }
+    menu.appendChild(newSubmit);
+    menu.appendChild(newNode);
+    menu.appendChild(newInput);
+    menu.style.display = "block";
+    menu.style.left = x+"px";
+    menu.style.top = y+"px";
+  }
+
+  function createNode(x,y,type){ 
+      var node = new NodeObj(type);
+      if(type == "node"){
+        node.addInput('Value1');
+        node.addInput('Value2');
+      }
+      if(type == "input"){
+        node.addInput('On input');
+      }
+      node.moveTo({x:x,y:y});
+      node.initUI();
+      menu.style.display = "none";
+      node.configure();
+      //console.log(dialogue);
+  }
+
+save.onclick = function(){
+
+  for(var i=0;i<collection.lenth; i++){
+    collection[i].configure();
+  }
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //console.log(this.responseText);
+      }
+    };
+
+  //console.log(dialogue);
+  var dat = JSON.stringify(dialogue);
+  //console.log(dat);
+
+  xhttp.open("POST", "/save", true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send("json="+dat);
+}
+
+  submit.onclick = function(){
+
+    //console.log(quill.root.innerHTML)
+    //quill.setText('Hello\n');
+    if(inputting.operation == "add"){
+      if(inputting.type == "message"){
+        inputting.object.addMessage(quill.root.innerHTML);
+        dial.style.display = "none";
+      } else {
+        inputting.object.addInput(quill.root.innerHTML);
+        dial.style.display = "none";
+      }
+
+      inputting.object.configure();
+
+    } else {
+      if(inputting.type == "message"){
+        inputting.object.text = quill.root.innerHTML;
+        inputting.object.domElement.innerHTML = quill.root.innerHTML;
+        dial.style.display = "none";
+      } else {
+        //inputting.object.addInput(quill.root.innerHTML);
+        inputting.object.domElement.innerHTML = quill.root.innerHTML;
+        inputting.object.name = quill.root.innerHTML;
+        dial.style.display = "none";
+      }
+      
+      inputting.object.parentObj.configure();
+
+    }
+  }
+
+  // MOUSE SETUP
+  // =============
+  var mouse = {
+    currentInput: null,
+    createPath: function(a, b){
+      var diff = {
+        x: b.x - a.x,
+        y: b.y - a.y
+      };
+    
+      var pathStr = 'M' + a.x + ',' + a.y + ' ';
+      pathStr += 'C';
+      pathStr += a.x + diff.x / 3 * 2 + ',' + a.y + ' ';
+      pathStr += a.x + diff.x / 3 + ',' + b.y + ' ';
+      pathStr += b.x + ',' + b.y;
+      
+      return pathStr;
+    }
+  };
+  
+  window.onmousemove = function(e){
+     // console.log("x is "+e.pageX+"y is "+e.pageY)
+    if(mouse.currentInput){
+      var p = mouse.currentInput.path;
+      var iP = mouse.currentInput.getAttachPoint();
+      var oP = {x: e.pageX /zoom, y: e.pageY/zoom};
+      
+      //console.log("here"+oP)
+      
+      //console.log("x is "+e.pageX+"y is "+e.pageY)
+      var s = mouse.createPath(iP, oP);
+      p.setAttributeNS(null, 'd', s);
+    }
+  };
+  
+  window.onclick = function(e){
+    if(mouse.currentInput){
+      mouse.currentInput.path.removeAttribute('d');
+      if(mouse.currentInput.node){
+        mouse.currentInput.node.detachInput(mouse.currentInput);
+      }
+      mouse.currentInput = null;
+    }
+  };
+  
+  // CLEAN UP AND ACTUAL CODE [WIP]
+  // ================================
+  
+  function GetFullOffset(element){
+    var offset = {
+      top: element.offsetTop,
+      left: element.offsetLeft,
+    };
+    
+    if(element.offsetParent){
+      var po = GetFullOffset(element.offsetParent);
+      offset.top += po.top;
+      offset.left += po.left;
+      return offset;
+    }
+    else
+      return offset;
+  }
+  
+  function NodeObj(type){
+    // DOM Element creation
+    var typeName = {
+      "node": "Dialogue Node",
+      "input": "User Input",
+      "submit":"Submit Form"
+    };
+    this.domElement = document.createElement('div');
+    this.domElement.classList.add('node');
+    this.domElement.setAttribute('title', typeName[type]);
+    
+    // Create output visual
+    var outDom = document.createElement('span');
+    outDom.classList.add('output');
+    outDom.innerHTML = '&nbsp;';
+    this.domElement.appendChild(outDom);
+
+    // Create header visual
+    var Nodeheader = document.createElement('div');
+    Nodeheader.classList.add('nodeHeader');
+    Nodeheader.innerHTML = typeName[type];
+    this.domElement.appendChild(Nodeheader);
+
+
+    //PUSH TO dialogue object (basic configuration)
+
+    var testRowIndex = dialogue.push({
+      type:type,
+      inputs:[],
+      messages:[],
+      position:{},
+      uid:"",
+      inpType:"",
+      submitUrl:""
+    }) - 1;
+    // then you can access that item like this
+    //var item = dialogue[testRowIndex];
+
+    this.configIndex = testRowIndex;
+
+
+
+    // msg visual
+    // node + input
+    var mSpace = document.createElement('div');
+    mSpace.classList.add('mspace');
+      if(type != "submit"){
+        this.domElement.appendChild(mSpace);
+      }
+    this.mSpace = mSpace;
+
+    // Create menu visual
+
+    //addMsg
+    var addMsg = document.createElement('div');
+    addMsg.classList.add('menuitem');
+    addMsg.innerHTML = 'Add Message';
+    //this.domElement.appendChild(outDom);
+
+    
+    //addOpt
+    // NODE ONLY
+    var addOpt = document.createElement('div');
+    addOpt.classList.add('menuitem');
+    addOpt.innerHTML = 'Add Option';
+    //this.domElement.appendChild(outDom);
+
+    //start
+    var start = document.createElement('div');
+    start.classList.add('menuitem');
+    start.innerHTML = 'Set as start point';
+    
+    //delNode
+    var delNode = document.createElement('div');
+    delNode.classList.add('menuitem');
+    delNode.innerHTML = 'Delete Node';
+    //this.domElement.appendChild(outDom);
+
+    //set start
+    start.onclick = function(e){
+        
+      menu.style.display = "none";
+
+      function findStart() {
+        return dialogue.filter(
+          function(data) {
+            return data.start == true;
+          }
+        );
+      }
+
+      var found = findStart();
+
+      if(found[0]){
+        found[0].start = false;
+      }
+      //console.log(that.configIndex);
+      dialogue[that.configIndex].start = true;
+
+      //console.log(dialogue);
+    }
+    
+    $(this.domElement).mousedown(function(e){
+   //what can I write here to prevent parent's click event from fireing?
+   e.stopPropagation();
+   //alert("asd");
+   //event.stopImmediatePropagation() already 
+   });
+
+    // Output Click handler
+    var that = this;
+    outDom.onclick = function(e){
+      if(mouse.currentInput &&
+         !that.ownsInput(mouse.currentInput)){
+        var tmp = mouse.currentInput;
+        mouse.currentInput = null;
+        that.connectTo(tmp);
+      }
+      e.stopPropagation();
+    };
+    this.domElement.oncontextmenu = function(e){
+      //var evt = new Object({keyCode:93});
+      ///stopEvent(e); 
+      var x = e.clientX /zoom + $(document).scrollLeft();     // Get the horizontal coordinate
+      var y = e.clientY /zoom + $(document).scrollTop();     // Get the vertical coordinate
+      event.preventDefault();
+      event.stopPropagation();
+      menu.style.display="block";
+      menu.style.left = x+"px";
+      menu.style.top = y+"px";
+      menu.innerHTML = "";
+      if(type != "submit"){
+        menu.appendChild(addMsg);
+      }
+
+      if(type == "node"){
+        menu.appendChild(addOpt);
+      }
+
+      menu.appendChild(start);
+      menu.appendChild(delNode);
+    }
+
+    //menu click events
+
+    addMsg.onclick = function(e){
+      inputting = {
+        operation: "add",
+        object:that,
+        type:"message"
+      }
+      dial.style.display = "block";
+      menu.style.display = "none";
+    }
+
+    addOpt.onclick = function(e){
+      inputting = {
+        operation: "add",
+        object:that,
+        type:"option"
+      }
+      dial.style.display = "block";
+      menu.style.display="none";
+    }
+
+
+    function textInput(title, that){
+      
+      var textInput = document.createElement('input');
+      var varName = document.createElement('div');
+      var space = document.createElement('div');
+      var inspace = document.createElement('div');
+      var done = document.createElement('div');
+      varText = document.createElement('div');
+
+      var editIcon = document.createElement('div');
+      editIcon.innerHTML = `<i class="material-icons" style="font-size: 17px;float: right;">edit</i>`.trim();
+      editIcon = editIcon.firstChild;
+
+      that.textInput = textInput;
+      that.varName = varName;
+      
+      textInput.type = 'text';
+
+      
+      inspace.classList.add('inputBox');
+      textInput.classList.add('inputVar');
+      done.classList.add('done');
+      varText.classList.add('varText');
+      varName.classList.add('varName');
+
+      inspace.style.display = "none";
+
+      space.classList.add('mspace');
+      space.innerHTML = title;
+      done.innerHTML = `<i class="material-icons" style="font-size:22px;">check_circle</i>`;
+
+      that.domElement.appendChild(space);
+      space.appendChild(inspace);
+      space.appendChild(varText);
+      inspace.appendChild(textInput);
+      inspace.appendChild(done);
+
+
+      varText.appendChild(varName);
+      varText.appendChild(editIcon);
+      
+      //varName.insertAdjacentHTML('afterend', `<i class="material-icons" style="font-size: 17px;float: right;">edit</i>`);
+
+      function textSave(){
+        if(textInput.value != ""){
+          inspace.style.display = "none";
+          varName.style.display = "block";      
+          editIcon.style.display = "block";
+          varName.innerHTML = textInput.value;
+          that.submitUrl = textInput.value;
+          that.configure();
+        }
+      }
+      
+      done.onclick = function(){
+        textSave();
+      }
+      /*
+            textInput.onchange = function(){
+              urlsave();
+            }
+      */
+      varText.onclick = function(){
+              inspace.style.display = "block";
+              varName.style.display = "none";
+              editIcon.style.display = "none";
+            }
+
+    }
+
+
+    if(type == "node"){
+
+    }
+
+    if(type == "input"){
+      var inpType = document.createElement('select');
+      this.inpTypeDom = inpType;
+      this.domElement.appendChild(inpType);
+
+      var optext = document.createElement("option");
+      optext.text = "Text";
+      optext.value = "text";
+
+      var opemail = document.createElement("option");
+      opemail.text = "Email";
+      opemail.value = "email";
+
+      var opint = document.createElement("option");
+      opint.text = "Number";
+      opint.value = "number";
+
+      var opdate = document.createElement("option");
+      opdate.text = "Date";
+      opdate.value = "date";
+
+      inpType.add(optext, inpType[0]);
+      inpType.add(opemail, inpType[1]);
+      inpType.add(opint, inpType[2]);
+      inpType.add(opdate, inpType[3]);
+      mSpace.appendChild(inpType);
+      //this.domElement.appendChild(inpType);
+      textInput("Unique Id",that);
+      inpType.onchange = function(){
+        that.inpType = inpType.value;
+        that.configure();
+      }
+
+    }
+
+    if(type == "submit"){
+
+        textInput("asdf",that);
+
+    }
+
+    // Node Stuffs
+    this.value = '';
+    this.messages = [];
+    this.inputs = [];
+    this.connected = false;
+    
+    // SVG Connectors
+    this.attachedPaths = [];
+
+    
+    this.configure();
+  }
+
+NodeObj.prototype.addInputType = function(type){
+  this.inpType = type;
+  this.inpTypeDom.value = type;
+}
+
+NodeObj.prototype.addTextInputs = function(submitUrl, uid){
+  console.log(uid);
+  this.submitUrl = submitUrl;
+  this.uid = uid;
+
+  if(uid != ""){
+    this.textInput.value = uid;
+    this.varName.innerHTML = uid;
+  }
+
+  if(submitUrl != undefined){
+    this.textInput.value = submitUrl;
+    this.varName.innerHTML = submitUrl;
+  }
+}
+  
+  function NodeInput(name,node){
+    this.name = name;
+    this.node = null;
+    this.parentObj = node;
+    
+    // The dom element, here is where we could add
+    // different input types
+    this.domElement = document.createElement('div');
+    this.domElement.innerHTML = name;
+    this.domElement.classList.add('connection');
+    this.domElement.classList.add('empty');
+    
+    //ADD TO DIALOGUE CONFIG OBJ
+/*
+    var configIndex = dialogue[node.configIndex].inputs.push({
+      name:name,
+      connectedTo:null
+    });
+
+    this.configIndex = configIndex;
+*/
+    //menu viuals
+
+      //edit
+      var edit = document.createElement('div');
+      edit.classList.add('menuitem');
+      edit.innerHTML = 'Edit Option';
+      
+
+      //del
+      var del = document.createElement('div');
+      del.classList.add('menuitem');
+      del.innerHTML = 'Delete Option';
+
+      this.domElement.oncontextmenu = function(e){
+      //var evt = new Object({keyCode:93});
+      ///stopEvent(e); 
+      e.stopPropagation();
+      var x = e.clientX /zoom + $(document).scrollLeft();     // Get the horizontal coordinate
+      var y = e.clientY /zoom + $(document).scrollTop();     // Get the vertical coordinate
+      event.preventDefault();
+      console.log('success!');
+      menu.style.display="block";
+      menu.style.left = x+"px";
+      menu.style.top = y+"px";
+      //console.log(menu);
+      menu.innerHTML="";
+      menu.appendChild(edit);
+      menu.appendChild(del);
+    }
+
+      edit.onmousedown = function(e){
+        inputting = {
+          operation: "edit",
+          object:that,
+          type:"option"
+        }
+        dial.style.display = "block";
+        menu.style.display = "none";
+        var delta = quill.clipboard.convert(that.name)
+        quill.setContents(delta);
+        //inp.value = that.name;
+      }
+
+      del.onclick = function(e){
+        inputting = {
+          operation: "deleting",
+          object:that,
+          type:"option"
+        }
+        that.parentObj.removeInput(that);
+        menu.style.display = "none";
+      }
+
+      
+
+
+    // SVG Connector
+    this.path = document.createElementNS(svg.ns, 'path');
+    this.path.setAttributeNS(null, 'stroke', '#8e8e8e');
+    this.path.setAttributeNS(null, 'stroke-width', '2');
+    this.path.setAttributeNS(null, 'fill', 'none');
+    svg.appendChild(this.path);
+    
+    // DOM Event handlers
+    var that = this;
+    this.domElement.onclick = function(e){
+      if(mouse.currentInput){
+        if(mouse.currentInput.path.hasAttribute('d'))
+          mouse.currentInput.path.removeAttribute('d');
+        if(mouse.currentInput.node){
+          mouse.currentInput.node.detachInput(mouse.currentInput);
+          mouse.currentInput.node = null;
+        }
+      }
+      mouse.currentInput = that;
+      if(that.node){
+        that.node.detachInput(that);
+        that.domElement.classList.remove('filled');
+        that.domElement.classList.add('empty');
+      }
+      e.stopPropagation();
+    };
+  }
+  
+  function Message(text,node){
+    this.text = text;
+    this.node = null;
+    this.parentObj = node;
+    this.domElement = document.createElement("div");
+    this.domElement.classList.add('message');
+    this.domElement.innerHTML = text;
+    var that = this;
+      //edit
+      var edit = document.createElement('div');
+      edit.classList.add('menuitem');
+      edit.innerHTML = 'Edit Message';
+      
+
+      //del
+      var del = document.createElement('div');
+      del.classList.add('menuitem');
+      del.innerHTML = 'Delete Message';
+
+      this.domElement.oncontextmenu = function(e){
+      //var evt = new Object({keyCode:93});
+      ///stopEvent(e); 
+      e.stopPropagation();
+      var x = e.clientX /zoom + $(document).scrollLeft();     // Get the horizontal coordinate
+      var y = e.clientY /zoom + $(document).scrollTop();     // Get the vertical coordinate
+      event.preventDefault();
+      menu.style.display="block";
+      menu.style.left = x+"px";
+      menu.style.top = y+"px";
+      //console.log(menu);
+      menu.innerHTML="";
+      menu.appendChild(edit);
+      //console.log(edit);
+      menu.appendChild(del);
+    }
+
+    edit.onmousedown = function(e){
+        inputting = {
+          operation: "edit",
+          object:that,
+          type:"message"
+        }
+        dial.style.display = "block";
+        menu.style.display = "none";
+        const delta = quill.clipboard.convert(that.text)
+        quill.setContents(delta, 'silent');
+
+        //quill.setText(that.text);
+        //inp.value = that.text;
+        node.initUI();
+      }
+
+      del.onclick = function(e){
+        
+        var index = that.parentObj.messages.indexOf(that);
+        if (index > -1) {
+          that.parentObj.messages.splice(index, 1);
+        }
+        that.domElement.remove();
+        node.initUI();
+        menu.style.display = "none";
+      }
+  }
+
+
+  NodeInput.prototype.getAttachPoint = function(){
+    var offset = GetFullOffset(this.domElement);
+    return {
+      x: offset.left + this.domElement.offsetWidth - 2,
+      y: offset.top + this.domElement.offsetHeight / 2
+    };
+  };
+
+
+  NodeObj.prototype.configure = function(){
+
+    dialogue[this.configIndex].inputs = [];
+    dialogue[this.configIndex].messages = [];
+    dialogue[this.configIndex].submitUrl = this.submitUrl;
+    for(var i=0;i<this.inputs.length; i++){
+      //console.log(this.inputs[i]);
+      var connectedTo = null;
+      if(this.inputs[i].node != null){
+        connectedTo = this.inputs[i].node.configIndex;
+      }
+
+      dialogue[this.configIndex].inputs[i] = {
+        name:this.inputs[i].name,
+        connectedTo:connectedTo
+      };
+      //console.log(dialogue[this.configIndex].inputs[i]);
+    }
+
+    for(var i=0;i<this.messages.length; i++){
+      dialogue[this.configIndex].messages[i] = this.messages[i].text;
+    }
+
+      dialogue[this.configIndex].position = {
+        x:parseInt(this.domElement.style.left, 10),
+        y:parseInt(this.domElement.style.top, 10),
+    };
+    
+    dialogue[this.configIndex].inpType = this.inpType;
+
+  }
+  
+  NodeObj.prototype.getOutputPoint = function(){
+    var tmp = this.domElement.firstElementChild;
+    var offset = GetFullOffset(tmp);
+    
+    return {
+      x: offset.left + tmp.offsetWidth / 2,
+      y: offset.top + tmp.offsetHeight / 2
+    };
+  };
+  
+  NodeObj.prototype.addInput = function(name){
+    var input = new NodeInput(name, this);
+    this.inputs.push(input);
+    this.domElement.appendChild(input.domElement);
+    
+    return input;
+  };
+
+  NodeObj.prototype.removeInput = function(obj){
+    if(obj.node){
+    obj.node.detachInput(obj);
+  }
+    
+    var index = this.inputs.indexOf(obj);
+    if (index > -1) {
+        this.inputs.splice(index, 1);
+      }
+    //console.log(this);
+    //this.domElement.appendChild(input.domElement);
+
+    obj.domElement.remove();
+    this.initUI();
+    this.configure();
+    //console.log(this);
+  };
+
+  NodeObj.prototype.addMessage = function(text){
+    var message = new Message(text,this);
+    this.messages.push(message);
+    this.mSpace.appendChild(message.domElement);
+    this.initUI();
+    
+    return message;
+  };
+  
+  NodeObj.prototype.detachInput = function(input){
+    var index = -1;
+    for(var i = 0; i < this.attachedPaths.length; i++){
+      if(this.attachedPaths[i].input == input)
+        index = i;
+    };
+    
+    if(index >= 0){
+      this.attachedPaths[index].path.removeAttribute('d');
+      this.attachedPaths[index].input.node = null;
+      this.attachedPaths.splice(index, 1);
+    }
+    
+    if(this.attachedPaths.length <= 0){
+      this.domElement.classList.remove('connected');
+    }
+    
+    this.configure();
+    input.parentObj.configure();
+  };
+  
+  NodeObj.prototype.ownsInput = function(input){
+    for(var i = 0; i < this.inputs.length; i++){
+      if(this.inputs[i] == input)
+        return true;
+    }
+    return false;
+  };
+  
+  NodeObj.prototype.updatePosition = function(start){
+    var outPoint = this.getOutputPoint();
+    if(start ==true){
+      outPoint.x = outPoint.x/zoom;
+      outPoint.y = outPoint.y/zoom;
+      console.log(outPoint);
+    }
+    
+    //console.log(outPoint);
+    var aPaths = this.attachedPaths;
+    for(var i = 0; i < aPaths.length; i++){
+      var iPoint = aPaths[i].input.getAttachPoint();
+      var pathStr = this.createPath(iPoint, outPoint);
+      aPaths[i].path.setAttributeNS(null, 'd', pathStr);
+    }
+    
+    for(var j = 0; j < this.inputs.length; j++){
+      if(this.inputs[j].node != null){
+        var iP = this.inputs[j].getAttachPoint();
+        var oP = this.inputs[j].node.getOutputPoint();
+
+        var pStr = this.createPath(iP, oP);
+        this.inputs[j].path.setAttributeNS(null, 'd', pStr);
+      }
+    }
+    
+    this.configure();
+  };
+  
+  NodeObj.prototype.createPath = function(a, b){
+    var diff = {
+      x: b.x - a.x,
+      y: b.y - a.y
+    };
+    
+    var pathStr = 'M' + a.x + ',' + a.y + ' ';
+    pathStr += 'C';
+    pathStr += a.x + diff.x / 3 * 2 + ',' + a.y + ' ';
+    pathStr += a.x + diff.x / 3 + ',' + b.y + ' ';
+    pathStr += b.x + ',' + b.y;
+    
+    return pathStr;
+  };
+  
+  NodeObj.prototype.connectTo = function(input){
+    input.node = this;
+    this.connected = true;
+    this.domElement.classList.add('connected');
+    
+    input.domElement.classList.remove('empty');
+    input.domElement.classList.add('filled');
+    
+    this.attachedPaths.push({
+      input: input,
+      path: input.path
+    });
+    
+    var iPoint = input.getAttachPoint();
+    var oPoint = this.getOutputPoint();
+    var pathStr = this.createPath(iPoint, oPoint);
+    
+    input.path.setAttributeNS(null, 'd',pathStr);
+    this.configure();
+    input.parentObj.configure();
+  };
+  
+  NodeObj.prototype.moveTo = function(point){
+    this.domElement.style.top = point.y + 'px';
+    this.domElement.style.left = point.x + 'px';
+    this.updatePosition();
+    this.configure();
+  };
+  
+//drag
+
+
+function dragElement(elmnt, obj) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  // if (document.getElementById("nodeHeader")) {
+  //   /* if present, the header is where you move the DIV from:*/
+  //   document.getElementById("nodeHeader").onmousedown = dragMouseDown;
+  // } else {
+  //   /* otherwise, move the DIV from anywhere inside the DIV:*/
+  //   elmnt.onmousedown = dragMouseDown;
+  // }
+
+  $(elmnt).find('.nodeHeader').on('mousedown', dragMouseDown);
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2/zoom) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1/zoom) + "px";
+    obj.updatePosition();
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+  NodeObj.prototype.initUI = function(){
+    var that = this;
+    //console.log(dialogue[this.configIndex]);
+    if(dialogue[this.configIndex].start == true){
+      this.domElement.classList.add("firstNode");
+    }
+
+    dragElement(this.domElement,that);
+
+
+//     var click = {
+//     x: 0,
+//     y: 0
+// };
+
+// var isStart = false;
+//     //Make draggable
+//     $(this.domElement).draggable({
+//       cancel: '.connection,.output,.mspace',
+//       start: function(event) {
+//         click.x = event.clientX;
+//         click.y = event.clientY;
+//         isStart = true;
+//     },
+
+//     drag: function(event, ui) {
+//       console.log(isStart)
+
+//         // This is the parameter for scale()
+//         //var zoom = 1.5;
+
+//         var original = ui.originalPosition;
+
+//         // jQuery will simply use the same object we alter here
+//         ui.position = {
+//             left: (event.clientX - click.x + original.left) / zoom,
+//             top:  (event.clientY - click.y + original.top ) / zoom
+//         };
+
+//       that.updatePosition(isStart);
+//       isStart = false;
+
+//     } 
+//   });
+    // Fix positioning
+    this.domElement.style.position = 'absolute';
+    
+    area.appendChild(this.domElement);
+    // Update Visual
+    this.updatePosition();
+    this.configure();
+  };
+var collection = [];
+//var queryJson = [{"name":"Another One","inputs":[{"name":"Value1","connectedTo":2},{"name":"Value2","connectedTo":null},{"name":"Value3","connectedTo":null}],"messages":[],"position":{"x":150,"y":20}},{"name":"Node 2","inputs":[{"name":"Text In","connectedTo":0},{"name":"Value 5","connectedTo":2}],"messages":[],"position":{"x":20,"y":70}},{"name":"Something Else","inputs":[{"name":"Color4","connectedTo":null},{"name":"Position","connectedTo":null},{"name":"Noise Octaves","connectedTo":null}],"messages":[],"position":{"x":300,"y":150}}];
+
+  function initialize(queryJson){
+    for(var i=0; i<queryJson.length; i++){
+
+      var node = new NodeObj(queryJson[i].type);
+        collection.push(node);
+        for(var j=0; j<queryJson[i].inputs.length; j++){
+          node.addInput(queryJson[i].inputs[j].name);/*
+          if(queryJson[i].inputs[j].connectedTo != null){
+            queryJson[queryJson[i].inputs[j].connectedTo]
+          }*/
+        }
+
+        for(var j=0; j<queryJson[i].messages.length; j++){
+          node.addMessage(queryJson[i].messages[j]);
+        }
+
+        if(queryJson[i].type == "input"){
+          node.addInputType(queryJson[i].inpType)
+        }
+
+        node.addTextInputs(queryJson[i].submitUrl,queryJson[i].uid)
+        
+        node.moveTo(queryJson[i].position);
+
+        node.initUI();
+    }
+
+    for(var i=0; i<queryJson.length; i++){
+
+      for(var j=0; j<queryJson[i].inputs.length; j++){
+        if(queryJson[i].inputs[j].connectedTo != null){
+          collection[queryJson[i].inputs[j].connectedTo].connectTo(collection[i].inputs[j]);
+        }
+      }//node.inputs[0]
+    }
+
+
+  }
+
+
+  
+  // DEMO
+  // ========
+  /*
+  // Node 1
+  var node = new NodeObj('Another One');
+  node.addInput('Value1');
+  node.addInput('Value2');
+  node.addInput('Value3');
+  //dialogue.push(node);
+  
+  // Node 2
+  var node2 = new NodeObj('Node 2');
+  node2.addInput('Text In');
+  node2.addInput('Value 5');
+  //dialogue.push(node2);
+  
+  // Node 3
+  var node3 = new NodeObj('Something Else');
+  node3.addInput('Color4');
+  node3.addInput('Position');
+  node3.addInput('Noise Octaves');
+  //dialogue.push(node3);
+  
+  // Move to initial positions
+  node.moveTo({x: 150, y: 20});
+  node2.moveTo({x: 20, y: 70});
+  node3.moveTo({x:300, y:150});
+  
+  // Connect Nodes
+  node.connectTo(node2.inputs[0]);
+  node3.connectTo(node2.inputs[1]);
+  node3.connectTo(node.inputs[0]);
+  
+  // Add to DOM
+  node.initUI();
+  node2.initUI();
+  node3.initUI();
+  */
+  
+
+
+
+  </script> -->
+
+</html>

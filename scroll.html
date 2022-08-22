@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+
+body{
+    height: 5000px;
+}
+
+#gearbox {
+    display: flex;
+    justify-content: center;
+    margin-top: 50%;
+}
+#leftgear, #rightgear {
+    width: 20vw;
+    max-width: 20%;
+    height: auto;
+}
+
+</style>
+
+<body>
+    <div id="gearbox">
+        <img src="gear.svg" alt id="leftgear">
+        <img src="gear.svg" alt id="rightgear">
+    </div>
+</body>
+
+<script>
+
+var leftgear = document.getElementById("leftgear"),
+rightgear = document.getElementById("rightgear");
+    
+window.addEventListener("optimizedScroll", function() {
+    leftgear.style.transform = "rotate("+window.pageYOffset+"deg)";
+    rightgear.style.transform = "rotate(-"+window.pageYOffset+"deg)";
+});
+
+;(function() {
+    var throttle = function(type, name, obj) {
+        var obj = obj || window;
+        var running = false;
+        var func = function() {
+            if (running) { return; }
+            running = true;
+            requestAnimationFrame(function() {
+                obj.dispatchEvent(new CustomEvent(name));
+                running = false;
+            });
+        };
+        obj.addEventListener(type, func);
+    };
+    throttle ("scroll", "optimizedScroll");
+})();
+
+</script>
+
+</html>
+
