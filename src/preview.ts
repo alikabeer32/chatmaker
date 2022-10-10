@@ -12,6 +12,7 @@ var reset = document.getElementById("reset");
 var found;
 var first;
 
+let inputs = [];
 textInp.disabled = true;
 var form = new FormData();
 var json = dialogue;
@@ -61,6 +62,8 @@ reset.onclick = function(){
   phoneChat.innerHTML = "";
   found = findStart(dialogue);
   first = new Message(found);
+  inputs = [];
+  console.log(form);
 }
 
 
@@ -116,7 +119,6 @@ function checkForInput(msg){
   return msg;
 }
 
-const inputs = [];
 
 function Message(found){
 

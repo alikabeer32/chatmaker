@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+
+<body>
+        <div class="container-phone">
+          <div class="phone">
+            <div class="phone-header">
+              <div class="phone-header-back">
+                <div class="phone-header-back__icon"></div>
+              </div>
+              <div class="phone-header-contact">
+                <div class="phone-header-contact__avatar">
+                  <img src="https://github.com/Timothy1982/chat-app-css-illustration/raw/master/images/avatar.jpg" alt="Samuel Green's Avatar" />
+                </div>
+                <div class="phone-header-contact__name">
+                  <strong>Samuel Green</strong><br />
+                  Available to Walk
+                </div>
+              </div>
+              <div class="phone-header-options">
+                <div class="phone-header-options__icon"></div>
+              </div>
+            </div>
+
+            <div id="chatscroll">            
+              <div id="phone-chat" class="phone-chat">
+              </div>
+            </div>
+
+            <div class="phone-input">
+              <input id="textInp" placeholder="Type a message…" type="text">
+              <input id="textSubmit" placeholder="Type a message…" type="submit">
+              
+              <div class="phone-input__btn"></div>
+            </div>
+          </div>
+        </div>
+</body>
+
+<script>
+var textInp = document.getElementById("textInp");
+var textSubmit = document.getElementById("textSubmit");
+var chatscroll = document.getElementById("chatscroll");
+var phoneChat = document.getElementById("phone-chat");
+textInp.disabled = true;
+var form = {};
+var json = [{"type":"node","inputs":[{"name":"<p>I need a chatbot</p>","connectedTo":1},{"name":"<p>Show me what you can do!</p>","connectedTo":4}],"messages":["<p>Hi there! <span class=\"ql-emojiblot\" data-name=\"smiley\">﻿<span contenteditable=\"false\"><span class=\"ap ap-smiley\">😃</span></span>﻿</span> I am a no-code chatbot! How can I help you?</p>"],"position":{"x":114,"y":191},"uid":"","start":true},{"type":"input","inputs":[{"name":"On input","connectedTo":5}],"messages":["<p>Can I get your name? <span class=\"ql-emojiblot\" data-name=\"thinking_face\">﻿<span contenteditable=\"false\"><span class=\"ap ap-thinking_face\">🤔</span></span>﻿</span></p>"],"position":{"x":662,"y":77},"uid":"","inpType":"text","submitUrl":"name"},{"type":"node","inputs":[{"name":"<p>Yes</p>","connectedTo":3},{"name":"<p>No!</p>","connectedTo":0}],"messages":["<p>Alright, [name]. The email you entered is, [email]</p>","<p>Would you like to submit a request for an offer?</p>"],"position":{"x":1131,"y":182},"uid":""},{"type":"submit","inputs":[],"messages":[],"position":{"x":1518,"y":278},"uid":"","submitUrl":"https://dsazxcx.com/asdom.php"},{"type":"node","inputs":[{"name":"<p>Interesting!</p>","connectedTo":1}],"messages":["<p>I can conduct amazing conversations like this one, to allow your visitors to feel welcome! <span class=\"ql-emojiblot\" data-name=\"yum\">﻿<span contenteditable=\"false\"><span class=\"ap ap-yum\">😋</span></span>﻿</span></p>"],"position":{"x":358,"y":408},"uid":""},{"type":"input","inputs":[{"name":"On input","connectedTo":2}],"messages":["<p>Can I get your email? <span class=\"ql-emojiblot\" data-name=\"kissing_closed_eyes\">﻿<span contenteditable=\"false\"><span class=\"ap ap-kissing_closed_eyes\">😚</span></span>﻿</span><span class=\"ql-emojiblot\" data-name=\"incoming_envelope\">﻿<span contenteditable=\"false\"><span class=\"ap ap-incoming_envelope\">📨</span></span>﻿</span></p>"],"position":{"x":917,"y":81},"uid":"","inpType":"email","submitUrl":"email"}];
+const messages = document.getElementsByClassName("msg");
+for (let i = 0; messages.length > i; i++) {
+  setTimeout(() => messages[i].classList.add("show"), i * 1000);
+}
+
+function findStart() {
+  return json.filter(
+    function(data) {
+      return data.start == true
+    }
+  );
+}
+console.log(json);
+var found = findStart();
+
+console.log(found[0]);
+
+console.log(found);
+
+function OptionObj(connectedTo,name){
+  this.connectedTo = connectedTo;
+  this.name = name;
+  this.domElement = document.createElement("div");
+  this.domElement.innerHTML = name;
+  var that = this;
+  this.domElement.onclick = function(){
+      this.parentElement.remove();
+      var reply = document.createElement("div");
+      reply.innerHTML = that.name;
+      reply.classList.add("phone-chat-msg__me");
+      reply.classList.add("msg");
+      document.getElementsByClassName("phone-chat")[0].appendChild(reply);
+        setTimeout(function(){ 
+          reply.classList.add("show");
+          chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+        }, 500);
+      var node = new Message(json[connectedTo]);
+    }
+  
+  this.domElement.classList.add("option");
+}
+
+function checkForInput(msg){
+  console.log(msg);
+  for(var i=0;i<inputs.length;i++){
+    console.log(inputs);
+      msg = msg.replace('['+inputs[i].variable+']', inputs[i].value);
+  }
+  return msg;
+}
+
+const inputs = [];
+
+
+
+function Message(found){
+
+  this.domElement = document.createElement("div");
+  this.mSpace = document.createElement("div");
+  this.oSpace = document.createElement("div");
+  var that = this;
+
+  if(found.type == "node"){  
+    
+    for(var i=0; i<found.inputs.length; i++){
+    var option = new OptionObj(found.inputs[i].connectedTo,found.inputs[i].name);
+    this.oSpace.appendChild(option.domElement);
+    var index = i;
+
+    }
+  }
+
+
+if(found.type == "input"){  
+    
+  if(found.inpType == "date"){
+    var date = document.createElement("input");
+    date.type = "date";
+    var submit = document.createElement("div");
+    submit.innerHTML = "Submit";
+    submit.onclick = function(){
+      //form.append("date",date.value);
+      form['date'] = date.value;
+      inputs.push({"variable":found.submitUrl,"value":date.value})
+      submit.remove();
+      date.remove();
+      var reply = document.createElement("div");
+      reply.innerHTML = date.value;
+      reply.classList.add("phone-chat-msg__me");
+      reply.classList.add("msg");
+      document.getElementsByClassName("phone-chat")[0].appendChild(reply);
+        setTimeout(function(){ 
+          reply.classList.add("show"); 
+
+          var totalHeight = 0;
+          $(phoneChat).children().each(function(){
+                totalHeight += $(this).outerHeight();
+                //alert(totalHeight)
+                //alert($(this).outerHeight())
+            });
+
+            console.log("totalHeight"+totalHeight);
+            console.log("totalHeight2"+phoneChat.offsetHeight);
+            console.log("chatscrol"+chatscroll.offsetHeight);
+
+            if((totalHeight > chatscroll.offsetHeight)||(phoneChat.offsetHeight > chatscroll.offsetHeight)){
+            chatscroll.style.overflowY = "hidden";
+            chatscroll.style.overflowY = "scroll";
+            chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+          }
+
+          chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+        }, 500);
+      new Message(json[found.inputs[0].connectedTo]);
+    }
+    this.oSpace.appendChild(date);
+    this.oSpace.appendChild(submit);
+  } else {
+    textInp.disabled = false;
+    textInp.type = "email";
+    textInp.focus();
+    textSubmit.onclick = function(){
+      inputs.push({"variable":found.submitUrl,"value":textInp.value})
+      //form.append("email",textInp.value);
+      form['email'] = textInp.value;
+      var data = textInp.value;
+      textInp.value = "";
+      textInp.disabled = true;      
+      var reply = document.createElement("div");
+      reply.innerHTML = data;
+      reply.classList.add("phone-chat-msg__me");
+      reply.classList.add("msg");
+      document.getElementsByClassName("phone-chat")[0].appendChild(reply);
+        setTimeout(function(){
+          reply.classList.add("show"); 
+
+          var totalHeight = 0;
+          $(phoneChat).children().each(function(){
+                totalHeight += $(this).outerHeight();
+                //alert(totalHeight)
+                //alert($(this).outerHeight())
+            });
+
+            console.log("totalHeight"+totalHeight);
+            console.log("totalHeight2"+phoneChat.offsetHeight);
+            console.log("chatscrol"+chatscroll.offsetHeight);
+
+            if((totalHeight > chatscroll.offsetHeight)||(phoneChat.offsetHeight > chatscroll.offsetHeight)){
+            chatscroll.style.overflowY = "hidden";
+            chatscroll.style.overflowY = "scroll";
+            chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+          }
+
+          chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+        }, 500);
+      console.log(json[found.inputs[0].connectedTo])
+      new Message(json[found.inputs[0].connectedTo]);
+    }
+  }
+}
+if(found.type == "submit"){
+  console.log(found.submitUrl);
+//   var xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function() {
+//   if (this.readyState == 4 && this.status == 200) {
+//     console.log(this.responseText);
+//   }
+//   };
+
+  
+// xhttp.open("POST", "http://localhost:3000/endpoint", true);
+// xhttp.withCredentials = true
+// xhttp.setRequestHeader("Content-type", "application/json");
+// xhttp.send("json="+form);
+
+var dat = JSON.stringify(form);
+console.log(dat);
+
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+if (this.readyState == 4 && this.status == 200) {
+//console.log(this.responseText);
+}
+};
+
+xhttp.open("POST", "http://localhost:3000/endpoint", true);
+xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhttp.send("json="+dat);
+
+// $.ajax({
+//     type: 'POST',
+//     xhrFields: {
+//         withCredentials: true
+//     },
+//     data: JSON.stringify(form),
+//     dataType : 'json',
+//     processData: false,
+//     crossDomain: true,
+//     url: "http://localhost:3000/endpoint",
+// });
+
+}
+
+  for(var i=0; i<found.messages.length; i++){
+  var mText = document.createElement("div");
+    mText.innerHTML = checkForInput(found.messages[i]);
+    mText.classList.add("phone-chat-msg__contact");
+    this.mSpace.appendChild(mText);
+    mText.classList.add("show");
+    chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+  }
+
+  this.domElement.appendChild(this.mSpace);
+  this.domElement.appendChild(this.oSpace);
+  
+  chatscroll.scrollTop = chatscroll.scrollHeight;
+  this.domElement.classList.add("msg");
+  document.getElementsByClassName("phone-chat")[0].appendChild(this.domElement);
+
+  setTimeout(function(){ 
+      that.domElement.classList.add("show"); 
+      chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+    //alert("pchat"+phoneChat.offsetHeight);
+    var totalHeight = 0;
+    $(phoneChat).children().each(function(){
+          totalHeight += $(this).outerHeight();
+          //alert(totalHeight)
+          //alert($(this).outerHeight())
+      });
+
+      console.log("totalHeight"+totalHeight);
+      console.log("totalHeight2"+phoneChat.offsetHeight);
+      console.log("chatscrol"+chatscroll.offsetHeight);
+
+    if((totalHeight > chatscroll.offsetHeight)||(phoneChat.offsetHeight > chatscroll.offsetHeight)){
+      chatscroll.style.overflowY = "hidden";
+      chatscroll.style.overflowY = "scroll";
+      chatscroll.scrollTop = chatscroll.scrollHeight - chatscroll.clientHeight;
+    }
+
+  }, 1000);
+
+}
+
+var dat = JSON.stringify({"asd":"asd","asd":"asd"});
+console.log(dat);
+
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+if (this.readyState == 4 && this.status == 200) {
+console.log(this.responseText);
+} else {
+  console.log(this.readyState);
+  console.log(this.status);
+}
+};
+
+xhttp.open("POST", "http://localhost:3000/endpoint", true);
+xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhttp.send("json="+dat);
+
+
+$.ajax({
+    xhrFields: {
+        withCredentials: true
+    },
+    data: 'postdata={"some":"json"}',
+    dataType : 'jsonp',
+    processData: false,
+    crossDomain: true,
+    url: "https://themesmatch.com/hookpost.php?callback=?",
+    success: function(data) {
+         return data; 
+      }
+});
+
+var first = new Message(found[0]);
+
+/*
+
+
+    <div class="container">
+        <div class="container-phone">
+          <div class="phone">
+            <div class="phone-header">
+              <div class="phone-header-back">
+                <div class="phone-header-back__icon"></div>
+              </div>
+              <div class="phone-header-contact">
+                <div class="phone-header-contact__avatar">
+                  <img src="https://github.com/Timothy1982/chat-app-css-illustration/raw/master/images/avatar.jpg" alt="Samuel Green's Avatar" />
+                </div>
+                <div class="phone-header-contact__name">
+                  <strong>Samuel Green</strong><br />
+                  Available to Walk
+                </div>
+              </div>
+              <div class="phone-header-options">
+                <div class="phone-header-options__icon"></div>
+              </div>
+            </div>
+            <div class="phone-chat">
+              <div class="phone-chat-msg__contact msg">
+                That sounds great. I’d be happy with that.
+              </div>
+              <div class="phone-chat-msg__contact msg">
+                Could you send over some pictures of your dog, please?
+              </div>
+              <div class="phone-chat-msg__pics msg">
+                <div class="phone-chat-msg__img"></div>
+                <div class="phone-chat-msg__img"></div>
+                <div class="phone-chat-msg__img"></div>
+              </div>
+              <div class="phone-chat-msg__me msg">
+                Here are a few pictures. She’s a happy girl!
+              </div>
+              <div class="phone-chat-msg__me msg">Can you make it?</div>
+              <div class="phone-chat-msg__contact msg">
+                She looks so happy! The time we discussed works. How long shall I
+                take her out for?
+              </div>
+              <div class="msg">
+                <div class="phone-chat-offer">
+                  30 minute walk <strong>$29</strong>
+                </div>
+                <div class="phone-chat-offer">
+                  1 hour walk <strong>$49</strong>
+                </div>
+              </div>
+            </div>
+            <div class="phone-input">
+              Type a message…
+              <div class="phone-input__btn"></div>
+            </div>
+          </div>
+        </div>
+        <div class="container-text">
+          <h1>Simple booking</h1>
+          <p>
+            Stay in touch with our dog walkers through the chat interface. This
+            makes it easy to discuss arrangements and make bookings. Once the walk
+            has been completed you can rate your walker and book again all through
+            the chat.
+          </p>
+        </div>
+      </div>
+
+*/
+
+
+</script>
+
+</html>

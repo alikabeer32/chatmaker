@@ -23863,6 +23863,7 @@ var phoneChat = document.getElementById("phone-chat");
 var reset = document.getElementById("reset");
 var found;
 var first;
+let inputs = [];
 textInp.disabled = true;
 var form = new FormData();
 var json = script_1.dialogue;
@@ -23904,6 +23905,8 @@ reset.onclick = function () {
     phoneChat.innerHTML = "";
     found = findStart(script_1.dialogue);
     first = new Message(found);
+    inputs = [];
+    console.log(form);
 };
 function findStart(jsonObj) {
     console.log(jsonObj);
@@ -23947,7 +23950,6 @@ function checkForInput(msg) {
     }
     return msg;
 }
-const inputs = [];
 function Message(found) {
     this.domElement = document.createElement("div");
     this.mSpace = document.createElement("div");
