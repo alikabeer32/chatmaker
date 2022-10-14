@@ -14,7 +14,7 @@ const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 
 
-mongoose.connect(process.env.DATABASE_URL, {
+mongoose.connect('mongodb://mongo:sMcPbQEPDt7C77jqH14f@containers-us-west-91.railway.app:7672L', {
   useNewUrlParser:true,
   useUnifiedTopology: true
 })
