@@ -16,7 +16,12 @@ const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://mongo:sMcPbQEPDt7C77jqH14f@containers-us-west-91.railway.app:7672L', {
   useNewUrlParser:true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  server: {
+    socketOptions: {
+      socketTimeoutMS: 0,
+      connectTimeoutMS: 0
+    }
 })
 const db = mongoose.connection
 db.on('error', error => console.error(error))
