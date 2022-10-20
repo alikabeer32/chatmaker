@@ -13,15 +13,12 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 
+//mongodb://localhost:27017
+//mongodb://mongo:WPZBbk9ZNsIptEHNSQ9c@containers-us-west-91.railway.app:7672
 
-mongoose.connect('mongodb://mongo:sMcPbQEPDt7C77jqH14f@containers-us-west-91.railway.app:7672L', {
-  useNewUrlParser:true,
-  useUnifiedTopology: true,
-  server: {
-    socketOptions: {
-      socketTimeoutMS: 0,
-      connectTimeoutMS: 0
-    }
+mongoose.connect('mongodb://mongo:WPZBbk9ZNsIptEHNSQ9c@containers-us-west-91.railway.app:7672', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 })
 const db = mongoose.connection
 db.on('error', error => console.error(error))
